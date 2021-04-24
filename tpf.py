@@ -17,7 +17,7 @@ class StatusConstant:
     NTP: Final = 0x01
     PTPD: Final = 0x02
     FCPTPD: Final = 0x04
-    ALL: Final = 0x07
+    ALL: Final = 0x10
     #result picture file position
     NTP_PATH: Final = './r/ntp'   
     FCPTPD_PATH: Final = './r/fcptpd'
@@ -123,7 +123,7 @@ def initialize_matplotlib():
     plt.gca().set_xlabel('Number of measurements', fontsize=12)
     plt.gca().set_ylabel('Time Offset', fontsize= 12)
     plt.gca().yaxis.set_major_formatter(mticker.FormatStrFormatter('%.3f s'))
-    plt.title('Ntp Time Offset')
+    plt.title('Measure Time Offset')
     plt.grid(True)
     plt.tight_layout()
 
@@ -204,7 +204,8 @@ if(Status.CHECK_NTP()) :
     # print(data_list)
     plt.scatter(np.arange(0,1000,1), data_list, alpha=0.8, label="ntp", marker=".")
     plt.legend()
-    plt.savefig(Status.GET_NTP_PATH())
+    if(not Status.CHECK_ALL()):
+        plt.savefig(Status.GET_NTP_PATH())
 
 if(Status.CHECK_FCPTPD()):
     data_list = []
@@ -218,11 +219,33 @@ if(Status.CHECK_FCPTPD()):
             data_list.append(float(line[:-2]))
             if(len(data_list) == 1000):
                 break
-    plt.clf()
-    initialize_matplotlib()
+    if(not Status.CHECK_ALL()):
+        plt.clf()
+        initialize_matplotlib()
     plt.scatter(np.arange(0,1000,1), data_list, c= ['#ff7f0e'],alpha=0.8, label="fc ptpd", marker=".")
     plt.legend()
-    plt.savefig(Status.GET_FC_PTPD_PATH())
+    if(not Status.CHECK_ALL()):
+        plt.savefig(Status.GET_FC_PTPD_PATH())
 
 if(Status.CHECK_PTPD()):
     data_list = []
+    ptpd_data = Path(Status.GET_PTPD_DATA_PATH())
+    if(not ptpd_data.is_file()):
+        print("Error: no ptpd data file\n")
+        print(help_options)
+        exit() 
+    with open(Status.GET_PTPD_DATA_PATH()) as fd:
+        for line in fd:
+            data_list.append(float(line[:-2]))
+            if(len(data_list) == 1000):
+                break
+    if(not Status.CHECK_ALL()):
+        plt.clf()
+        initialize_matplotlib()
+    plt.scatter(np.arange(0,1000,1), data_list, c= ['#17becf'],alpha=0.8, label="ptpd", marker=".")
+    plt.legend()
+    if(not Status.CHECK_ALL()):
+        plt.savefig(Status.GET_PTPD_PATH())
+
+if(Status.CHECK_ALL()) :
+    plt.savefig(Status.GET_ALL_PATH())
