@@ -122,7 +122,7 @@ def initialize_matplotlib():
     plt.axis([0, 1000, 0, 0.003])
     plt.gca().set_xlabel('Number of measurements', fontsize=12)
     plt.gca().set_ylabel('Time Offset', fontsize= 12)
-    plt.gca().yaxis.set_major_formatter(mticker.FormatStrFormatter('%.3f s'))
+    plt.gca().yaxis.set_major_formatter(mticker.FormatStrFormatter('%.4f s'))
     plt.title('Measure Time Offset')
     plt.grid(True)
     plt.tight_layout()
@@ -175,15 +175,15 @@ for element in argv[1:]:
         Status.SET_FC_PTPD_PATH(element[4:])
     elif(element[:3] == '-pt'):
         Status.SET_PTPD_PATH(element[4:])
-    elif(element[:3] == 'at'):
+    elif(element[:3] == '-at'):
         Status.SET_ALL_PATH(element[4:])
     else:
-        print("Error:undefined Options")
+        print("Error:undefined Options " + element)
         print(help_options)
         exit()
 
 initialize_matplotlib()
-if(Status.CHECK_NTP()) :
+if(Status.CHECK_NTP() or Status.CHECK_ALL()) :
     data_list = []
     ntp_data = Path(Status.GET_NTP_DATA_PATH())
     if(not ntp_data.is_file()):
@@ -207,7 +207,7 @@ if(Status.CHECK_NTP()) :
     if(not Status.CHECK_ALL()):
         plt.savefig(Status.GET_NTP_PATH())
 
-if(Status.CHECK_FCPTPD()):
+if(Status.CHECK_FCPTPD() or Status.CHECK_ALL()):
     data_list = []
     fc_ptp_data = Path(Status.GET_FC_PTPD_DATA_PATH())
     if(not fc_ptp_data.is_file()):
@@ -227,7 +227,7 @@ if(Status.CHECK_FCPTPD()):
     if(not Status.CHECK_ALL()):
         plt.savefig(Status.GET_FC_PTPD_PATH())
 
-if(Status.CHECK_PTPD()):
+if(Status.CHECK_PTPD() or Status.CHECK_ALL()):
     data_list = []
     ptpd_data = Path(Status.GET_PTPD_DATA_PATH())
     if(not ptpd_data.is_file()):
